@@ -24,7 +24,7 @@ class GetActiveUserListAction implements ConsoleCommandAction {
 	public void execute(SenderWrapSocket socket) {
 		byte[] message = SendMessageCreator.reqActiveUserList();
 		byte[] encriptedMessage = CommunicateCycript.cycriptMessage(message);
-		byte[] sendMess = SendMessageCreator.reqCommon(encriptedMessage);
+		byte[] sendMess = SendMessageCreator.commonPrive(encriptedMessage);
 		socket.setDestSocketAddress(routerAddress);
 		socket.sendMessage(sendMess);
 	}

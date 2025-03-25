@@ -7,9 +7,6 @@ import javax.crypto.spec.SecretKeySpec;
 import com.yana.privateNetTest.LocalMachine.communicate.key.KeyStoredManager;
 
 public class CommunicateCycript {
-	public enum CommunicateType {
-		REQ,ACK
-	}
 	public static byte[] cycriptMessage(byte[] message) {
 		SecretKeySpec secretKeySepc = KeyStoredManager.getSecretKeySpec();
 		Cipher commonCipher = KeyStoredManager.getCommonCipher();

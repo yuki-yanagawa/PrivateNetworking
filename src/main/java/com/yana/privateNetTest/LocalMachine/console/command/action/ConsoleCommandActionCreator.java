@@ -20,6 +20,10 @@ public class ConsoleCommandActionCreator {
 			return new GetActiveUserListAction(commandLine);
 		case CONNECT_USER:
 			return new ConnectUserAction(commandLine);
+		case GET_LIST_ALL:
+			return new GetListAllCommand(commandLine);
+		case TAKE:
+			return new TakeCommandAction(commandLine);
 		default:
 			return new NoneAction();
 		}

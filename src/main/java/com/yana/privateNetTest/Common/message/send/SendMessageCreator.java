@@ -8,7 +8,7 @@ import com.yana.privateNetTest.Common.charDef.CharCodeDefnition;
 
 public class SendMessageCreator {
 	private static final String LINE_SEPARATOR = CharCodeDefnition.MESSAGE_LINE_SEPARATOR;
-	private static final Charset CHARSET = CharCodeDefnition.MESSAGE_CHARSET; 
+	private static final Charset CHARSET = CharCodeDefnition.MESSAGE_CHARSET;
 
 	public static byte[] reqClientHello() {
 		return (SendMessageHeader.REQ_JOIN_HELLO + LINE_SEPARATOR).getBytes(CHARSET);
@@ -87,9 +87,9 @@ public class SendMessageCreator {
 				SendMessageBody.createBodyData(activeUserList) + LINE_SEPARATOR).getBytes(CHARSET);
 	}
 
-	public static byte[] reqCommon(byte[] cycriptedMessage) {
+	public static byte[] commonPrive(byte[] cycriptedMessage) {
 		try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-			bos.write((SendMessageHeader.REQ_COMMON + LINE_SEPARATOR).getBytes(CHARSET));
+			bos.write((SendMessageHeader.COMMON_PRIVE + LINE_SEPARATOR).getBytes(CHARSET));
 			bos.write((SendMessageBody.createBodyLength(cycriptedMessage) + LINE_SEPARATOR).getBytes(CHARSET));
 			bos.write((SendMessageBody.createBodyData(cycriptedMessage) + LINE_SEPARATOR).getBytes(CHARSET));
 			return bos.toByteArray();
@@ -99,15 +99,17 @@ public class SendMessageCreator {
 		return new byte[0];
 	}
 
-	public static byte[] ackCommon(byte[] cycriptedMessage) {
-		try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-			bos.write((SendMessageHeader.ACK_COMMON + LINE_SEPARATOR).getBytes(CHARSET));
-			bos.write((SendMessageBody.createBodyLength(cycriptedMessage) + LINE_SEPARATOR).getBytes(CHARSET));
-			bos.write((SendMessageBody.createBodyData(cycriptedMessage) + LINE_SEPARATOR).getBytes(CHARSET));
-			return bos.toByteArray();
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		return new byte[0];
+	public static byte[] reqHelloMyNameIs(String name) {
+		return (SendMessageHeader.REQ_HELLO_MYNAMEIS + LINE_SEPARATOR +
+				SendMessageBody.createBodyData(name)).getBytes(CHARSET);
+	}
+
+	public static byte[] ackHelloMyNameIs(String name) {
+		return (SendMessageHeader.ACK_HELLO_MYNAMEIS + LINE_SEPARATOR + 
+				SendMessageBody.createBodyData(name)).getBytes(CHARSET);
+	}
+
+	public static byte[] reqListAllData() {
+		return (SendMessageHeader.REQ_LIST_ALL + LINE_SEPARATOR).getBytes();
 	}
 }

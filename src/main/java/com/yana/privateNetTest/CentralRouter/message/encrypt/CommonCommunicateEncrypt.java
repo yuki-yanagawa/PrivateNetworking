@@ -15,7 +15,7 @@ public class CommonCommunicateEncrypt {
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, secKey, ivParameterSpec);
 			byte[] encriptedMess = cipher.doFinal(message);
-			return SendMessageCreator.ackCommon(encriptedMess);
+			return SendMessageCreator.commonPrive(encriptedMess);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

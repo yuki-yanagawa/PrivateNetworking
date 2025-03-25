@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactorySpi;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -20,10 +18,11 @@ import com.yana.privateNetTest.Common.connectingHandshake.ConnectineHandShake;
 import com.yana.privateNetTest.Common.message.MessageDefinition;
 import com.yana.privateNetTest.Common.message.recv.RecvMessage;
 import com.yana.privateNetTest.Common.message.recv.RecvMessageQueue;
-import com.yana.privateNetTest.Common.message.recv.fragment.FragmentActor;
+import com.yana.privateNetTest.Common.message.send.SendMessageCreator;
 import com.yana.privateNetTest.Common.micromodel.ActorRef;
 import com.yana.privateNetTest.Common.micromodel.LookUpActor;
 import com.yana.privateNetTest.Common.socket.SenderWrapSocket;
+import com.yana.privateNetTest.LocalMachine.communicate.cycript.CommunicateCycript;
 import com.yana.privateNetTest.LocalMachine.communicate.key.GetRouterPublickKeyFromCert;
 import com.yana.privateNetTest.LocalMachine.communicate.key.KeyStoredManager;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleActor;
@@ -31,6 +30,7 @@ import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
 import com.yana.privateNetTest.LocalMachine.handshake.CentralRouterHandShakeState;
 import com.yana.privateNetTest.LocalMachine.message.categoly.DecideLocalActionCategory;
 import com.yana.privateNetTest.LocalMachine.message.categoly.LocalActionCategory;
+import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
 
 class RequestMessageAnalyzerThreadStart extends Thread {
 	private SenderWrapSocket senderWrapSocket;
@@ -92,9 +92,18 @@ class RequestMessageAnalyzerThreadStart extends Thread {
 		// Inner communicate
 		case DISPLAY_ACTIVE_USER:
 			String activeUserList = (String)reqParameter.get(MessageDefinition.BODY);
-			ActorRef actor = LookUpActor.getActorRef(ConsoleActor.class);
-			actor.tell(new ConsoleOutputMessage(activeUserList));
+			outputMessage(activeUserList);
 			return;
+		case REGIST_CONNECTED_ACTIVE_USER:
+			String connectedUsername = (String)reqParameter.get(MessageDefinition.BODY);
+			MyInfoCache.setConnectedUser(destSocketAddress, connectedUsername);
+			outputMessage("conneceted active user info; name=" + connectedUsername + "/addr=" + destSocketAddress);
+			break;
+		case ACK_HELLO_MYNAMEIS:
+			byte[] ackHelloMess = CommunicateCycript.cycriptMessage(SendMessageCreator.ackHelloMyNameIs(MyInfoCache.getName()));
+			senderWrapSocket.setDestSocketAddress(destSocketAddress);
+			senderWrapSocket.sendMessage(SendMessageCreator.commonPrive(ackHelloMess));
+			break;
 		case NONE:
 			break;
 		}
@@ -145,12 +154,8 @@ class RequestMessageAnalyzerThreadStart extends Thread {
 					.split(CharCodeDefnition.MESSAGE_LINE_SEPARATOR);
 			Map<String, Object> reqNewParameter = new HashMap<>();
 			for(int i = 1; i < requestMessLine.length; i++) {
-				String[] inner = requestMessLine[i].split(":");
-				if(inner.length > 2) {
-					reqNewParameter.put(inner[0].trim(), inner[1].trim() + ":" + inner[2].trim());
-				} else {
-					reqNewParameter.put(inner[0].trim(), inner[1].trim());
-				}
+				int index = requestMessLine[i].indexOf(":");
+				reqNewParameter.put(requestMessLine[i].substring(0, index), requestMessLine[i].substring(index + 1));
 			}
 			String requestHeader = requestMessLine[0].trim();
 			LocalActionCategory action = DecideLocalActionCategory.decideAction(requestHeader);
@@ -158,5 +163,10 @@ class RequestMessageAnalyzerThreadStart extends Thread {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void outputMessage(String message) {
+		ActorRef actor = LookUpActor.getActorRef(ConsoleActor.class);
+		actor.tell(new ConsoleOutputMessage(message));
 	}
 }

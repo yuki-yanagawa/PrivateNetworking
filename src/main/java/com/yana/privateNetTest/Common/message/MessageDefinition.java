@@ -4,19 +4,19 @@ public class MessageDefinition {
 	//REQ
 	public static final String REQ_JOIN_HELLO = "REQ_JOIN_HELLO";
 	public static final String REQ_REGIST_ME = "REQ_REGIST_ME";
-	public static final String REQ_COMMON = "REQ_COMMON";
-
-	//REQ_COMMON_INNER
-	public static final String REQ_ACTIVE_USER_LIST = "REQ_ACTIVE_USER_LIST";
-	public static final String REQ_LIST_ALL = "REQ_LIST_ALL";
-
 	//ACK
 	public static final String ACK_JOIN_HELLO = "ACK_JOIN_HELLO";
 	public static final String ACK_REGIST_YOU = "ACK_REGIST_YOU";
-	public static final String ACK_COMMON = "ACK_COMMON";
+
+	public static final String COMMON_PRIVE = "COMMON_PRIVE";
+	//REQ_COMMON_PRIVE
+	public static final String REQ_ACTIVE_USER_LIST = "REQ_ACTIVE_USER_LIST";
+	public static final String REQ_HELLO_MYNAMEIS = "REQ_HELLO_MYNAMEIS";
+	public static final String REQ_LIST_ALL = "REQ_LIST_ALL";
 
 	//ACK COMMON INNER
 	public static final String ACK_ACTIVE_USER_LIST = "ACK_ACTIVE_USER_LIST";
+	public static final String ACK_HELLO_MYNAMEIS = "ACK_HELLO_MYNAMEIS";
 
 	//SETTING SEPARATOR
 	public static final String SETTING_SEPARATOR = ":";

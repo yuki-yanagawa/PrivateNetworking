@@ -18,6 +18,7 @@ import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
 import com.yana.privateNetTest.LocalMachine.console.command.CommandAnalyzer;
 import com.yana.privateNetTest.LocalMachine.handshake.CentralRouterHandShakeState;
 import com.yana.privateNetTest.LocalMachine.key.generate.MyLocalKeyGenerate;
+import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
 import com.yana.privateNetTest.LocalMachine.prop.PropertiesReader;
 
 public class ConsoleEntryPoint {
@@ -58,6 +59,9 @@ public class ConsoleEntryPoint {
 
 			console.newLine();
 			console.printDisplay("HELLO " + userName);
+
+			// MyInfo set
+			MyInfoCache.setName(userName);
 
 			// My Key Check
 			MyLocalKeyGenerate myLocalKeyGenerate = new MyLocalKeyGenerate();

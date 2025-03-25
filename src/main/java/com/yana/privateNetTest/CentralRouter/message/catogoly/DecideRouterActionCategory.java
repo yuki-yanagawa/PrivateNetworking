@@ -11,7 +11,7 @@ public class DecideRouterActionCategory {
 		if(MessageDefinition.REQ_REGIST_ME.equals(messageHeader.trim())) {
 			return RouterActionCategory.ACK_REGIST_YOU;
 		}
-		if(MessageDefinition.REQ_COMMON.equals(messageHeader.trim())) {
+		if(MessageDefinition.COMMON_PRIVE.equals(messageHeader.trim())) {
 			return RouterActionCategory.COMMON_COMMUNICATE;
 		}
 
