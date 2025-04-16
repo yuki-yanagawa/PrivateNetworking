@@ -13,7 +13,7 @@ public class ConsoleCommandActionCreator {
 
 		switch(cmd) {
 		case NONE:
-			return new NoneAction();
+			return new NoneAction(new String[0]);
 		case HELP:
 			return new HelpAction(commandLine);
 		case ACTIVE_USER_LIST:
@@ -22,10 +22,14 @@ public class ConsoleCommandActionCreator {
 			return new ConnectUserAction(commandLine);
 		case GET_LIST_ALL:
 			return new GetListAllCommand(commandLine);
+		case MY_LIST_ALL:
+			return new GetMyList(commandLine);
+//		case REQ_YOUR_DATA:
+//			return new GetDataCommand(commandLine);
 		case TAKE:
 			return new TakeCommandAction(commandLine);
 		default:
-			return new NoneAction();
+			return new NoneAction(new String[0]);
 		}
 
 	}

@@ -7,14 +7,15 @@ import com.yana.privateNetTest.Common.message.send.SendMessageCreator;
 import com.yana.privateNetTest.Common.micromodel.ActorRef;
 import com.yana.privateNetTest.Common.micromodel.LookUpActor;
 import com.yana.privateNetTest.Common.socket.SenderWrapSocket;
+import com.yana.privateNetTest.LocalMachine.communicate.cycript.CommunicateCycript;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleActor;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
+import com.yana.privateNetTest.LocalMachine.exchange.send.CollectIngDataInfo;
 import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
 
-public class TakeCommandAction implements ConsoleCommandAction {
-	private final String[] args;
+public class TakeCommandAction extends AbstractConsoleCommand {
 	TakeCommandAction(String[] args) {
-		this.args = args;
+		super(args);
 	}
 	@Override
 	public void execute(SenderWrapSocket socket) {
@@ -26,9 +27,13 @@ public class TakeCommandAction implements ConsoleCommandAction {
 		}
 		String reqData = args[1];
 		//create take message
-		//byte[] takeReqMessage = SendMessageCreator.reqActiveUserList();
+		CollectIngDataInfo.setCollectingFileName(reqData);
+		byte[] takeReqMessage = SendMessageCreator.reqYourData(reqData);
+		byte[] encriptedMess = CommunicateCycript.cycriptMessage(takeReqMessage);
+		byte[] sendMess = SendMessageCreator.commonPrive(encriptedMess);
 		InetSocketAddress socketAddress = optAddr.get();
 		socket.setDestSocketAddress(socketAddress);
+		socket.sendMessage(sendMess);
 	}
 
 }

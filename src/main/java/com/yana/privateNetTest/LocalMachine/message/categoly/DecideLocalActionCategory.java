@@ -24,6 +24,21 @@ public class DecideLocalActionCategory {
 		if(MessageDefinition.REQ_HELLO_MYNAMEIS.equals(messageHeader.trim())) {
 			return LocalActionCategory.ACK_HELLO_MYNAMEIS;
 		}
+		if(MessageDefinition.REQ_LIST_ALL.equals(messageHeader.trim())) {
+			return LocalActionCategory.ACK_LIST_ALL;
+		}
+		if(MessageDefinition.ACK_LIST_ALL.equals(messageHeader.trim())) {
+			return LocalActionCategory.DISPLAY_RESPONSE_LIST_ALL;
+		}
+		if(MessageDefinition.REQ_YOUR_DATA.equals(messageHeader.trim())) {
+			return LocalActionCategory.ACK_MY_DATA;
+		}
+		if(MessageDefinition.ACK_FAILED.equals(messageHeader.trim())) {
+			return LocalActionCategory.NOTIFY_REQESUT_FAILED;
+		}
+		if(MessageDefinition.ACK_MY_DATA.equals(messageHeader.trim())) {
+			return LocalActionCategory.COLLECT_ACK_DATA;
+		}
 		return LocalActionCategory.NONE;
 	}
 }

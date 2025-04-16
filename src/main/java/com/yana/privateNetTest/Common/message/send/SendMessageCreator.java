@@ -112,4 +112,27 @@ public class SendMessageCreator {
 	public static byte[] reqListAllData() {
 		return (SendMessageHeader.REQ_LIST_ALL + LINE_SEPARATOR).getBytes();
 	}
+
+	public static byte[] ackFileNameLine(String fileName, long size) {
+		return SendMessageFileData.createFileInfoLine(fileName, size, LINE_SEPARATOR, CHARSET);
+	}
+
+	public static byte[] ackFileName(byte[] fileNameLines) {
+		return (SendMessageHeader.ACK_LIST_ALL + LINE_SEPARATOR + 
+				SendMessageBody.createBodyData(fileNameLines) + LINE_SEPARATOR).getBytes(CHARSET);
+	}
+
+	public static byte[] reqYourData(String fileName) {
+		return (SendMessageHeader.REQ_YOUR_DATA + LINE_SEPARATOR + 
+				SendMessageBody.createBodyData(fileName)).getBytes(CHARSET);
+	}
+
+	public static byte[] ackMyData(byte[] fileData) {
+		return (SendMessageHeader.ACK_MY_DATA + LINE_SEPARATOR + 
+				SendMessageBody.createBodyData(fileData) + LINE_SEPARATOR).getBytes(CHARSET);
+	}
+
+	public static byte[] ackFailed() {
+		return (SendMessageHeader.ACK_FAILED + LINE_SEPARATOR).getBytes(CHARSET);
+	}
 }

@@ -13,10 +13,14 @@ public class MessageDefinition {
 	public static final String REQ_ACTIVE_USER_LIST = "REQ_ACTIVE_USER_LIST";
 	public static final String REQ_HELLO_MYNAMEIS = "REQ_HELLO_MYNAMEIS";
 	public static final String REQ_LIST_ALL = "REQ_LIST_ALL";
+	public static final String REQ_YOUR_DATA = "REQ_YOUR_DATA";
 
 	//ACK COMMON INNER
 	public static final String ACK_ACTIVE_USER_LIST = "ACK_ACTIVE_USER_LIST";
 	public static final String ACK_HELLO_MYNAMEIS = "ACK_HELLO_MYNAMEIS";
+	public static final String ACK_LIST_ALL = "ACK_LIST_ALL";
+	public static final String ACK_MY_DATA = "ACK_MY_DATA";
+	public static final String ACK_FAILED = "ACK_FAILED";
 
 	//SETTING SEPARATOR
 	public static final String SETTING_SEPARATOR = ":";

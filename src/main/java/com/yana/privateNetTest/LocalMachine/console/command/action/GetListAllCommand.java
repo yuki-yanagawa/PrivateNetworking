@@ -1,7 +1,6 @@
 package com.yana.privateNetTest.LocalMachine.console.command.action;
 
 import java.net.InetSocketAddress;
-import java.security.CryptoPrimitive;
 import java.util.Optional;
 
 import com.yana.privateNetTest.Common.message.send.SendMessageCreator;
@@ -13,10 +12,9 @@ import com.yana.privateNetTest.LocalMachine.console.ConsoleActor;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
 import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
 
-public class GetListAllCommand implements ConsoleCommandAction {
-	private final String[] args;
+public class GetListAllCommand extends AbstractConsoleCommand {
 	GetListAllCommand(String[] args) {
-		this.args = args;
+		super(args);
 	}
 	@Override
 	public void execute(SenderWrapSocket socket) {

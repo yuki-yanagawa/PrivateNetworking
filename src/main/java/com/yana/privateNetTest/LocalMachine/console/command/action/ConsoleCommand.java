@@ -7,6 +7,8 @@ enum ConsoleCommand {
 			+ " ex) I want to connect active userA. userA ipaddr is 192.168.0.10, port is 9090."
 			+ " Then, you enter \"CONNECT_USER 192.168.0.10:9090\""),
 	GET_YOUR_INFOMATION("Get information from connected active user."),
+	MY_LIST_ALL("GET My List"),
+	REQ_YOUR_DATA("request data from active(connected) user. ex) REQ_YOU_DATA sample.txt"),
 	GET_LIST_ALL("GET list all from connected active user."),
 	TAKE("try to take XXXX from connected active user."
 			+ " ex) TAKE yourPhot.png"),

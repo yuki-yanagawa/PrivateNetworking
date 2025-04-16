@@ -1,11 +1,15 @@
 package com.yana.privateNetTest.LocalMachine.main;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.SocketAddress;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,7 +31,11 @@ import com.yana.privateNetTest.LocalMachine.communicate.key.GetRouterPublickKeyF
 import com.yana.privateNetTest.LocalMachine.communicate.key.KeyStoredManager;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleActor;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
+import com.yana.privateNetTest.LocalMachine.exchange.recv.ExchangeDirCollectInfo;
+import com.yana.privateNetTest.LocalMachine.exchange.recv.ExchangeEnableFile;
+import com.yana.privateNetTest.LocalMachine.exchange.send.CollectIngDataInfo;
 import com.yana.privateNetTest.LocalMachine.handshake.CentralRouterHandShakeState;
+import com.yana.privateNetTest.LocalMachine.logger.LocalMachineLogger;
 import com.yana.privateNetTest.LocalMachine.message.categoly.DecideLocalActionCategory;
 import com.yana.privateNetTest.LocalMachine.message.categoly.LocalActionCategory;
 import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
@@ -86,26 +94,110 @@ class RequestMessageAnalyzerThreadStart extends Thread {
 			handShakeCompleteAction(reqParameter);
 			return;
 		case COMMON_COMMUNICATE:
+			LocalMachineLogger.info("COMMON_COMMUNICATE");
 			readInnerActionCategory(reqParameter, destSocketAddress);
 			return;
 
 		// Inner communicate
 		case DISPLAY_ACTIVE_USER:
+			LocalMachineLogger.info("DISPLAY_ACTIVE_USER");
 			String activeUserList = (String)reqParameter.get(MessageDefinition.BODY);
 			outputMessage(activeUserList);
 			return;
 		case REGIST_CONNECTED_ACTIVE_USER:
+			LocalMachineLogger.info("REGIST_CONNECTED_ACTIVE_USER");
 			String connectedUsername = (String)reqParameter.get(MessageDefinition.BODY);
 			MyInfoCache.setConnectedUser(destSocketAddress, connectedUsername);
 			outputMessage("conneceted active user info; name=" + connectedUsername + "/addr=" + destSocketAddress);
 			break;
 		case ACK_HELLO_MYNAMEIS:
-			byte[] ackHelloMess = CommunicateCycript.cycriptMessage(SendMessageCreator.ackHelloMyNameIs(MyInfoCache.getName()));
-			senderWrapSocket.setDestSocketAddress(destSocketAddress);
-			senderWrapSocket.sendMessage(SendMessageCreator.commonPrive(ackHelloMess));
+			LocalMachineLogger.info("ACK_HELLO_MYNAMEIS");
+//			byte[] ackHelloMess = CommunicateCycript.cycriptMessage(SendMessageCreator.ackHelloMyNameIs(MyInfoCache.getName()));
+//			senderWrapSocket.setDestSocketAddress(destSocketAddress);
+//			senderWrapSocket.sendMessage(SendMessageCreator.commonPrive(ackHelloMess));
+			sendMessageP2P(SendMessageCreator.ackHelloMyNameIs(MyInfoCache.getName()), destSocketAddress);
+			break;
+		case ACK_LIST_ALL:
+			LocalMachineLogger.info("ACK_LIST_ALL");
+			byte[] tmpMesAllList = createMyAllFileList();
+			if(tmpMesAllList.length == 0) {
+				sendMessageP2P(failedResponseMessage(), destSocketAddress);
+				break;
+			}
+			sendMessageP2P(tmpMesAllList, destSocketAddress);
+			break;
+		case DISPLAY_RESPONSE_LIST_ALL:
+			LocalMachineLogger.info("DISPLAY_RESPONSE_LIST_ALL");
+			outputMessage((String)reqParameter.get(MessageDefinition.BODY));
+		case ACK_MY_DATA:
+			LocalMachineLogger.info("ACK_MY_DATA");
+			String reqDataName = (String)reqParameter.get(MessageDefinition.BODY);
+			byte[] tmpReqDataMess = searcRequestData(reqDataName);
+			if(tmpReqDataMess.length == 0) {
+				sendMessageP2P(failedResponseMessage(), destSocketAddress);
+				break;
+			}
+			sendMessageP2P(tmpReqDataMess, destSocketAddress);
+			break;
+		case COLLECT_ACK_DATA:
+			LocalMachineLogger.info("COLLECT_ACK_DATA");
+			String tmpResponseData = (String)reqParameter.get(MessageDefinition.BODY);
+			if(collectFileData(tmpResponseData)) {
+				outputMessage("requset data getting success");
+			} else {
+				outputMessage("requset data getting failed");
+			}
+			break;
+		case NOTIFY_REQESUT_FAILED:
+			outputMessage("request failed...");
 			break;
 		case NONE:
+			LocalMachineLogger.info("NONE");
 			break;
+		}
+	}
+
+	private void sendMessageP2P(byte[] message, SocketAddress destSocketAddress) {
+		byte[] sendMess = CommunicateCycript.cycriptMessage(message);
+		senderWrapSocket.setDestSocketAddress(destSocketAddress);
+		senderWrapSocket.sendMessage(SendMessageCreator.commonPrive(sendMess));
+	}
+
+	private byte[] failedResponseMessage() {
+		return SendMessageCreator.ackFailed();
+	}
+
+	private byte[] searcRequestData(String reqDataName) {
+		if(!ExchangeDirCollectInfo.searchFileName(reqDataName)) {
+			return new byte[0];
+		}
+		ExchangeEnableFile targetFile = ExchangeDirCollectInfo.getTargetFileInfo(reqDataName);
+		if(targetFile.getFileSize() > Integer.MAX_VALUE) {
+			return new byte[0];
+		}
+		byte[] readFileData = new byte[(int)targetFile.getFileSize()];
+		try(FileInputStream fis = new FileInputStream(targetFile.getFilePath().toFile())) {
+			fis.read(readFileData);
+		} catch(IOException e) {
+			return new byte[0];
+		}
+		return SendMessageCreator.ackMyData(readFileData);
+	}
+
+	private boolean collectFileData(String data) {
+		byte[] dataBytes = Base64.getDecoder().decode(data);
+		return CollectIngDataInfo.writeData(dataBytes);
+	}
+
+	private byte[] createMyAllFileList() {
+		List<ExchangeEnableFile> list = ExchangeDirCollectInfo.getEnableExchangeAllList();
+		try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+			for(ExchangeEnableFile f : list) {
+				bos.write(SendMessageCreator.ackFileNameLine(f.getFilePath().toFile().getName(), f.getFileSize()));
+			}
+			return SendMessageCreator.ackFileName(bos.toByteArray());
+		} catch(IOException e) {
+			return new byte[0];
 		}
 	}
 

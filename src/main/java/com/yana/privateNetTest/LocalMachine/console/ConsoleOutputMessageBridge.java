@@ -17,10 +17,10 @@ public class ConsoleOutputMessageBridge implements Furture<ConsoleOutputMessage>
 	private STATE state = STATE.WAIT;
 	private ConsoleOutputMessage bridingData;
 	@Override
-	public synchronized ConsoleOutputMessage getCompletedData() {
+	public synchronized ConsoleOutputMessage getCompletedData(long timeOut) {
 		if(STATE.WAIT == state) {
 			try {
-				wait(3000);
+				wait(timeOut);
 			} catch(InterruptedException e) {
 				
 			}

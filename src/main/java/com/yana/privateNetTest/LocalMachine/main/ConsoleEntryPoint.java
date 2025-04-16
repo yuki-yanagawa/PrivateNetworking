@@ -16,8 +16,10 @@ import com.yana.privateNetTest.LocalMachine.console.ConsoleOperator.ConsoleColor
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOperator.ConsoleIOException;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
 import com.yana.privateNetTest.LocalMachine.console.command.CommandAnalyzer;
+import com.yana.privateNetTest.LocalMachine.exchange.recv.ExchangeDirMonitor;
 import com.yana.privateNetTest.LocalMachine.handshake.CentralRouterHandShakeState;
 import com.yana.privateNetTest.LocalMachine.key.generate.MyLocalKeyGenerate;
+import com.yana.privateNetTest.LocalMachine.logger.LocalMachineLogger;
 import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
 import com.yana.privateNetTest.LocalMachine.prop.PropertiesReader;
 
@@ -89,6 +91,17 @@ public class ConsoleEntryPoint {
 			// FragmentActor Ready
 			FragmentActor.activate();
 
+			// Directory monitor start
+			ExchangeDirMonitor.executeDirMonitor();
+
+			// Logging start
+			if(!LocalMachineLogger.start()) {
+				console.printDisplay("!!!WARNIG!!! LOG SETTING ERROR", ConsoleColor.RED);
+				return;
+			}
+
+			LocalMachineLogger.info("this is test");
+
 			SenderWrapSocket senderWrapSocket = new SenderWrapSocket(socket, senderPacketSize);
 			new ReciverThreadStart(new ReciverWrapSocket(socket, reciverPacketSize)).start();
 			new RequestMessageAnalyzerThreadStart(senderWrapSocket).start();
@@ -116,9 +129,13 @@ public class ConsoleEntryPoint {
 					console.printDisplay("GOOD BYE...");
 					break;
 				}
+				long timeOut = 3000;
+				if("TAKE".equals(command.trim().toUpperCase())) {
+					timeOut = 6000;
+				}
 				CommandAnalyzer commandAnalyzer = CommandAnalyzer.newInstance(senderWrapSocket);
 				commandAnalyzer.analyzeCommand(command);
-				ConsoleOutputMessage message = ConsoleOutputMessageBridge.getInstance().getCompletedData();
+				ConsoleOutputMessage message = ConsoleOutputMessageBridge.getInstance().getCompletedData(timeOut);
 				if(message == null) {
 					continue;
 				}
@@ -136,6 +153,8 @@ public class ConsoleEntryPoint {
 		} catch(IOException e) {
 			
 		} catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}

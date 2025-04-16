@@ -11,10 +11,9 @@ import com.yana.privateNetTest.LocalMachine.console.ConsoleActor;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
 import com.yana.privateNetTest.LocalMachine.myInfo.MyInfoCache;
 
-class ConnectUserAction implements ConsoleCommandAction {
-	private final String[] args;
+class ConnectUserAction extends AbstractConsoleCommand {
 	ConnectUserAction(String[] args) {
-		this.args = args;
+		super(args);
 	}
 	@Override
 	public void execute(SenderWrapSocket socket) {

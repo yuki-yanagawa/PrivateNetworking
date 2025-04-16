@@ -6,12 +6,11 @@ import com.yana.privateNetTest.Common.socket.SenderWrapSocket;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleActor;
 import com.yana.privateNetTest.LocalMachine.console.ConsoleOutputMessage;
 
-class HelpAction implements ConsoleCommandAction {
+class HelpAction extends AbstractConsoleCommand {
 	private static final String DISCRIPT_CMDLIST = "help cmdlist : displayed enable command list";
 	private static final String DISCRIPT_TARGETCMD = "help [cmd] : displayed [cmd] exeuting result";
-	private final String[] args;
 	HelpAction(String[] args) {
-		this.args = args;
+		super(args);
 	}
 	@Override
 	public void execute(SenderWrapSocket socket) {
